@@ -1,0 +1,41 @@
+version: "3"
+services:
+  shoppingsql:
+    image: mysql
+    container_name: shoppingsql
+    environment:
+      MYSQL_ROOT_PASSWORD: "admin"
+      MYSQL_DATABASE: "shopApplication"
+    ports:
+      - 3307:3306
+    volumes:
+      - "db:/var/lib/mysql"
+
+  customer:
+    build: ./skmall/
+    container_name: custapp
+    restart: on-failure
+    links:
+      - "shoppingsql:mysql"
+    ports:
+      - 8081:8081
+  parking:
+    build: ./skmallparking/
+    container_name: parkapp
+    restart: on-failure
+    links:
+      - "shoppingsql:mysql"
+    ports:
+      - 8082:8082
+  shops:
+    build: ./skmallshop/
+    container_name: shopspp
+    restart: on-failure
+    links:
+      - "shoppingsql:mysql"
+    ports:
+      - 8083:8083
+
+volumes:
+  db:
+
