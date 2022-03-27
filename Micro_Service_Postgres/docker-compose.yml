@@ -1,0 +1,52 @@
+version: '3.1'
+services:
+  postgresqldb:
+    image: postgres
+    container_name: springpsql
+    env_file:
+      - .env    
+    ports:
+      - "${POSTGRES_LOCAL_PORT}:${POSTGRES_DOCKER_PORT}"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - db:/var/lib/postgresql
+    networks:
+      - app-net
+
+  user_service:
+    container_name: userapp
+    build: ./user_service/
+    restart: on-failure
+    env_file:
+      - .env    
+    ports:
+      - "${USER_LOCAL_PORT}:${USER_DOCKER_PORT}"
+    depends_on:
+      - postgresqldb
+    networks:
+      - app-net
+
+
+  contact_service:
+    container_name: contactapp
+    restart: on-failure
+    build: ./contact_service/
+    env_file:
+      - .env
+    ports:
+      - "${CONTACT_LOCAL_PORT}:${CONTACT_DOCKER_PORT}"
+    depends_on:
+      - postgresqldb
+    networks:
+      - app-net
+
+volumes:
+  db:
+
+networks:
+  app-net:
+
+
