@@ -29,7 +29,6 @@ services:
     networks:
       - app-net
 
-
   contact_service:
     container_name: contactapp
     restart: on-failure
