@@ -1,0 +1,5 @@
+[masters]
+3.110.130.26 ansible_user=ubuntu ansible_private_key_file=./terraform_key.pem
+[workers]
+3.109.143.80 ansible_user=ubuntu ansible_private_key_file=./terraform_key.pem
+    

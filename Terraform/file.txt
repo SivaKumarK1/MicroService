@@ -1,0 +1,7 @@
+master_public_ip = [
+  "13.127.131.220",
+]
+worker1_public_ip = [
+  "3.111.168.218",
+]
+ 
