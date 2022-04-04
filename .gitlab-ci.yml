@@ -7,9 +7,9 @@ stages:
   - build #Docker compose up step
   - docker-deploy # Docker Hub
   - terraform-job
-  - validate
-  - plan
-  - apply
+  # - validate
+  # - plan
+  # - apply
 
 maven-job:
   image: maven
@@ -51,33 +51,16 @@ terraform:
   - terraform --version
   - terraform init
   stage: terraform-job
-  script:
-    echo "started"
-
-validate:
-  dependencies:
-    - "terraform"
-  stage: validate
-  script:
-    - terraform validate
-
-plan:
-  stage: plan
-  script:
-    - terraform plan -out "planfile"
-  dependencies:
-    - validate
   artifacts:
     paths:
-      - planfile
-
-apply:
-
-  stage: apply
+      - planfile  
   script:
+    echo "started"
+    - terraform validate
+    - terraform plan -out "planfile"
     - terraform apply -input=false "planfile"
-  dependencies:
-    - plan
+    
+ 
   when: manual
 
  
