@@ -52,8 +52,7 @@ apply:
   dependencies:
     - plan
   when: manual
-  only:
-    - master
+
  
 
  
