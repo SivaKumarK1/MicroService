@@ -26,13 +26,13 @@ init:
   script:
     - gitlab-terraform init
 
-validate:
-  stage: validate
+validate: 
+  extends: init
   script:
     - gitlab-terraform validate
 
 plan:
-  stage: build
+  extends: validate
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
@@ -44,7 +44,7 @@ plan:
       terraform: ${TF_ROOT}/plan.json
 
 apply:
-  stage: deploy
+  extends: plan
   environment:
     name: production
   script:
