@@ -11,9 +11,9 @@ variables:
   TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/example-production
 before_script:
   - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
-  - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} 
-  - rm -rf .terraform 
+  - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}   
   - cd ${TF_ROOT}
+  - rm -rf .terraform 
 
 stages:
   - prepare
