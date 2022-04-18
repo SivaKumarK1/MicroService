@@ -116,7 +116,7 @@ apply:
 # Purpose: Stop and destroy the resources configured by Terraform
 destroy:
   image: 
-    name: name: https://github.com/siticom/docker-terraform-ansible
+    name: https://github.com/siticom/docker-terraform-ansible
     entrypoint:
       - '/usr/bin/env'
       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
@@ -141,7 +141,7 @@ destroy:
   retry: 2
 
 ansible:
-  image: registry.gitlab.com/torese/docker-ansible
+  image: https://github.com/siticom/docker-terraform-ansible
   extends: final plan
   dependencies:
     - final plan
