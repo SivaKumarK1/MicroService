@@ -102,6 +102,7 @@ apply:
     on_stop: destroy
   script:
     - terraform apply -input=false -auto-approve $PLAN
+    - ls -R
   dependencies:
     - final plan
   artifacts:
