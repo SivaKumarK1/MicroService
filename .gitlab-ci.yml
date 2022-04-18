@@ -1,6 +1,4 @@
-image: docker/compose:latest
-services:
-  - docker:dind
+
 
 variables:
   # Provides a filename for the Terraform plan file
@@ -32,6 +30,9 @@ maven-job:
       - contact_service/target/*.jar
 
 build-job:    
+  image: docker/compose:latest
+  services:
+  - docker:dind
   stage: build
   dependencies:
     - maven-job
@@ -42,38 +43,19 @@ build-job:
 
 
 docker-job:
+  image: docker/compose:latest
+  services:
+  - docker:dind
   stage: docker-deploy
   dependencies:
     - maven-job
   script:
     - sh Docker_Deploy.sh
 
-# terraform:
-#   image: 
-#     name: hashicorp/terraform:light
-#     entrypoint:
-#       - '/usr/bin/env'
-#       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-#   before_script:
-#   - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
-#   - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-#   - rm -rf .terraform
-#   - cd Terraform/Project
-#   - terraform --version
-#   - terraform init
-#   artifacts:
-#     paths:
-#       - Terraform/Project/inventory/hosts
-
-#   stage: terraform-job 
-#   script:
-#     - echo "started"
-#     - sh make.sh
-
 
 final plan:
   image: 
-    name: hashicorp/terraform:light
+    name: https://github.com/siticom/docker-terraform-ansible
     entrypoint:
       - '/usr/bin/env'
       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
@@ -92,7 +74,6 @@ final plan:
     name: plan
     paths:
       - Terraform/Project/$PLAN
-    expire_in: 7 days
   only:
     - main
   # This ensures that only one instance of this job can run in case multiple workflows are launched in parallel
@@ -102,11 +83,11 @@ final plan:
 # Purpose: Apply the new Terraform configuration settings found in the plan file
 apply:
   image: 
-    name: hashicorp/terraform:light
+    name: https://github.com/siticom/docker-terraform-ansible
     entrypoint:
       - '/usr/bin/env'
       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-  # stage: terraform-job-apply
+  stage: terraform-job-apply
   extends: final plan
   before_script:
     - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
@@ -135,7 +116,7 @@ apply:
 # Purpose: Stop and destroy the resources configured by Terraform
 destroy:
   image: 
-    name: hashicorp/terraform:light
+    name: name: https://github.com/siticom/docker-terraform-ansible
     entrypoint:
       - '/usr/bin/env'
       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
