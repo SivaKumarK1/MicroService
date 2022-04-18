@@ -125,3 +125,27 @@ resource "aws_security_group" "micro_service_app_sg" {
   }
 
 }
+
+resource "null_resource" "postgres_install" { 
+  provisioner "local-exec" {
+	command = <<EOT
+    sleep 600;
+	  >postgres.ini;
+	  echo "[postgresql]" | tee -a postgres.ini;
+	  echo "${aws_instance.Postgres_instance.public_ip} ansible_ssh_private_key_file=${var.key_path}" | tee -a postgres.ini;
+    EOT
+  }
+}
+
+resource "null_resource" "docker_swarm" { 
+  provisioner "local-exec" {
+	command = <<EOT
+    sleep 600;
+	  >docker_swarm.ini;
+	  echo "[masters]" | tee -a docker_swarm.ini;
+	  echo "${aws_instance.Manager.public_ip} ansible_ssh_private_key_file=${var.key_path}" | tee -a docker_swarm.ini;
+    echo "[workers]" | tee -a docker_swarm.ini;
+	  echo "${aws_instance.Worker_01.public_ip} ansible_ssh_private_key_file=${var.key_path}" | tee -a docker_swarm.ini;
+    EOT
+  }
+}

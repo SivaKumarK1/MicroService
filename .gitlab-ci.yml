@@ -55,7 +55,7 @@ docker-job:
 
 final plan:
   image: 
-    name: https://github.com/siticom/docker-terraform-ansible
+    name: hashicorp/terraform:light
     entrypoint:
       - '/usr/bin/env'
       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
@@ -83,7 +83,7 @@ final plan:
 # Purpose: Apply the new Terraform configuration settings found in the plan file
 apply:
   image: 
-    name: https://github.com/siticom/docker-terraform-ansible
+    name: hashicorp/terraform:light
     entrypoint:
       - '/usr/bin/env'
       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
@@ -102,13 +102,13 @@ apply:
     on_stop: destroy
   script:
     - terraform apply -input=false -auto-approve $PLAN
-    # - sh make.sh
   dependencies:
     - final plan
+  artifacts:
+    paths:
+      - ./*.ini
   only:
     - main
-  # when: delayed
-  # start_in: 60 seconds
   # This ensures that only one instance of this job can run in case multiple workflows are launched in parallel
   resource_group: TIC_POC1
 
@@ -116,7 +116,7 @@ apply:
 # Purpose: Stop and destroy the resources configured by Terraform
 destroy:
   image: 
-    name: https://github.com/siticom/docker-terraform-ansible
+    name: hashicorp/terraform:light
     entrypoint:
       - '/usr/bin/env'
       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
@@ -127,7 +127,6 @@ destroy:
     - cd Terraform/Project
     - terraform version
     # Provides git the ability to access other private projects for use as remote Terraform modules
-    # - terraform init
   # stage: terraform-job-apply
   extends: apply
   script:
@@ -141,17 +140,19 @@ destroy:
   retry: 2
 
 ansible:
-  image: https://github.com/siticom/docker-terraform-ansible
+  image: registry.gitlab.com/torese/docker-ansible
   extends: final plan
-  dependencies:
-    - final plan
+  needs:
+    - job: apply
+      artifacts: true
   before_script:
     - cd Terraform/Project
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > terraform_key.pem
     - export ANSIBLE_HOST_KEY_CHECKING=False
   stage: ansible-job
   script:
-    - ansible-playbook -i inventory/hosts playbook.yml
+    - ansible-playbook --private-key terraform_key.pem -i postgres.ini install_postgres.yaml
+    - ansible-playbook --private-key terraform_key.pem -i docker_swarm.ini docker_swarm.yaml
   only:
     - main
   when: manual
