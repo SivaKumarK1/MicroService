@@ -19,38 +19,38 @@ stages:
   - ansible-job # Ansible
 
 
-# maven-job:
-#   image: maven
-#   stage: maven-compile
-#   script:
-#     - sh Jars.sh
-#   artifacts:
-#     paths:
-#       - user_service/target/*.jar
-#       - contact_service/target/*.jar
+maven-job:
+  image: maven
+  stage: maven-compile
+  script:
+    - sh Jars.sh
+  artifacts:
+    paths:
+      - user_service/target/*.jar
+      - contact_service/target/*.jar
 
-# build-job:    
-#   image: docker/compose:latest
-#   services:
-#   - docker:dind
-#   stage: build
-#   dependencies:
-#     - maven-job
-#   script:
-#     - echo "Compiling the code..."
-#     - docker-compose up --build -d
-#     - echo "Compile complete."
+build-job:    
+  image: docker/compose:latest
+  services:
+  - docker:dind
+  stage: build
+  dependencies:
+    - maven-job
+  script:
+    - echo "Compiling the code..."
+    - docker-compose up --build -d
+    - echo "Compile complete."
 
 
-# docker-job:
-#   image: docker/compose:latest
-#   services:
-#   - docker:dind
-#   stage: docker-deploy
-#   dependencies:
-#     - maven-job
-#   script:
-#     - sh Docker_Deploy.sh
+docker-job:
+  image: docker/compose:latest
+  services:
+  - docker:dind
+  stage: docker-deploy
+  dependencies:
+    - maven-job
+  script:
+    - sh Docker_Deploy.sh
 
 
 final plan:
