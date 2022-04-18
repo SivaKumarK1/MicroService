@@ -102,13 +102,13 @@ apply:
     on_stop: destroy
   script:
     - terraform apply -input=false -auto-approve $PLAN
-    - ls -R
+    # - ls -R
   dependencies:
     - final plan
   artifacts:
     paths:
-      - docker_swarm.ini
-      - postgres.ini
+      - Terraform/Project/docker_swarm.ini
+      - Terraform/Project/postgres.ini
   only:
     - main
   # This ensures that only one instance of this job can run in case multiple workflows are launched in parallel
