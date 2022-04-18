@@ -155,8 +155,8 @@ ansible:
     - export ANSIBLE_HOST_KEY_CHECKING=False
   stage: ansible-job
   script:
-    - ansible-playbook --private-key terraform_key.pem -i postgres.ini install_postgres.yaml
-    - ansible-playbook --private-key terraform_key.pem -i docker_swarm.ini docker_swarm.yaml
+    - ansible-playbook -i postgres.ini install_postgres.yaml
+    - ansible-playbook -i docker_swarm.ini docker_swarm.yaml
   only:
     - main
-  when: manual
+  # when: manual
