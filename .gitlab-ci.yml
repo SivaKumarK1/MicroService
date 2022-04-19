@@ -152,6 +152,7 @@ ansible:
   before_script:
     - cd Terraform/Project
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > terraform_key.pem
+    - chmod 400 terraform_key.pem
     - export ANSIBLE_HOST_KEY_CHECKING=False
   stage: ansible-job
   script:
