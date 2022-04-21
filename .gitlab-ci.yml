@@ -8,8 +8,8 @@ variables:
   # Provides a clue to Terraform that it is being run in a CI pipeline
   TF_IN_AUTOMATION: "true"
   
-before_script: 
-    - wget https://raw.githubusercontent.com/AnilComakeit/env/main/.env
+  
+    
 
 stages:  
   - maven-compile # Compile
@@ -39,6 +39,7 @@ build-job:
   dependencies:
     - maven-job
   script:
+    - wget https://raw.githubusercontent.com/AnilComakeit/env/main/.env
     - echo "Compiling the code..."
     - docker-compose up --build -d
     - echo "Compile complete."
@@ -52,6 +53,7 @@ docker-job:
   dependencies:
     - maven-job
   script:
+    - wget https://raw.githubusercontent.com/AnilComakeit/env/main/.env
     - sh Docker_Deploy.sh
 
 
