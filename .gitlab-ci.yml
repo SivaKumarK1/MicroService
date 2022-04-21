@@ -7,6 +7,7 @@ variables:
   JSON_PLAN_FILE: tfplan.json
   # Provides a clue to Terraform that it is being run in a CI pipeline
   TF_IN_AUTOMATION: "true"
+
   
   
     
@@ -25,36 +26,38 @@ maven-job:
   image: maven
   stage: maven-compile
   script:
+    - echo $ENV_URL
     - sh Jars.sh
+    - echo "Worked"
   artifacts:
     paths:
       - user_service/target/*.jar
       - contact_service/target/*.jar
 
-build-job:    
-  image: docker/compose:latest
-  services:
-  - docker:dind
-  stage: build
-  dependencies:
-    - maven-job
-  script:
-    - wget https://raw.githubusercontent.com/AnilComakeit/env/main/.env
-    - echo "Compiling the code..."
-    - docker-compose up --build -d
-    - echo "Compile complete."
+# build-job:    
+#   image: docker/compose:latest
+#   services:
+#   - docker:dind
+#   stage: build
+#   dependencies:
+#     - maven-job
+#   script:
+#     - wget https://raw.githubusercontent.com/AnilComakeit/env/main/.env
+#     - echo "Compiling the code..."
+#     - docker-compose up --build -d
+#     - echo "Compile complete."
 
 
-docker-job:
-  image: docker/compose:latest
-  services:
-  - docker:dind
-  stage: docker-deploy
-  dependencies:
-    - maven-job
-  script:
-    - wget https://raw.githubusercontent.com/AnilComakeit/env/main/.env
-    - sh Docker_Deploy.sh
+# docker-job:
+#   image: docker/compose:latest
+#   services:
+#   - docker:dind
+#   stage: docker-deploy
+#   dependencies:
+#     - maven-job
+#   script:
+#     - wget https://raw.githubusercontent.com/AnilComakeit/env/main/.env
+#     - sh Docker_Deploy.sh
 
 
 # final plan:
