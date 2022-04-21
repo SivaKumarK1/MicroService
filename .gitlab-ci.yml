@@ -1,5 +1,3 @@
-
-
 variables:
   # Provides a filename for the Terraform plan file
   PLAN: plan.tfplan
@@ -26,146 +24,145 @@ maven-job:
   image: maven
   stage: maven-compile
   script:
-    - echo "anilstarted"
-    - echo $ENV_URL
-    # - sh Jars.sh
+    - echo "Started" 
+    - sh Jars.sh
     - echo "Worked"
   artifacts:
     paths:
       - user_service/target/*.jar
       - contact_service/target/*.jar
 
-# build-job:    
-#   image: docker/compose:latest
-#   services:
-#   - docker:dind
-#   stage: build
-#   dependencies:
-#     - maven-job
-#   script:
-#     - wget https://raw.githubusercontent.com/AnilComakeit/env/main/.env
-#     - echo "Compiling the code..."
-#     - docker-compose up --build -d
-#     - echo "Compile complete."
+build-job:    
+  image: docker/compose:latest
+  services:
+  - docker:dind
+  stage: build
+  dependencies:
+    - maven-job
+  script:
+    - wget $ENV_URL
+    - echo "Compiling the code..."
+    - docker-compose up --build -d
+    - echo "Compile complete."
 
 
-# docker-job:
-#   image: docker/compose:latest
-#   services:
-#   - docker:dind
-#   stage: docker-deploy
-#   dependencies:
-#     - maven-job
-#   script:
-#     - wget https://raw.githubusercontent.com/AnilComakeit/env/main/.env
-#     - sh Docker_Deploy.sh
+docker-job:
+  image: docker/compose:latest
+  services:
+  - docker:dind
+  stage: docker-deploy
+  dependencies:
+    - maven-job
+  script:
+    - wget $ENV_URL
+    - sh Docker_Deploy.sh
 
 
-# final plan:
-#   image: 
-#     name: hashicorp/terraform:light
-#     entrypoint:
-#       - '/usr/bin/env'
-#       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-#   stage: terraform-job
-#   before_script:
-#   - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
-#   - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-#   - rm -rf .terraform
-#   - cd Terraform/Project
-#   - terraform version
-#   # Provides git the ability to access other private projects for use as remote Terraform modules
-#   - terraform init
-#   script:
-#     - terraform plan -out=$PLAN -input=false
-#   artifacts:
-#     name: plan
-#     paths:
-#       - Terraform/Project/$PLAN
-#   only:
-#     - main
-#   # This ensures that only one instance of this job can run in case multiple workflows are launched in parallel
-#   resource_group: TIC_POC1
+final plan:
+  image: 
+    name: hashicorp/terraform:light
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  stage: terraform-job
+  before_script:
+  - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
+  - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+  - rm -rf .terraform
+  - cd Terraform/Project
+  - terraform version
+  # Provides git the ability to access other private projects for use as remote Terraform modules
+  - terraform init
+  script:
+    - terraform plan -out=$PLAN -input=false
+  artifacts:
+    name: plan
+    paths:
+      - Terraform/Project/$PLAN
+  only:
+    - main
+  # This ensures that only one instance of this job can run in case multiple workflows are launched in parallel
+  resource_group: TIC_POC1
 
-# # Job: Apply | Stage: Apply
-# # Purpose: Apply the new Terraform configuration settings found in the plan file
-# apply:
-#   image: 
-#     name: hashicorp/terraform:light
-#     entrypoint:
-#       - '/usr/bin/env'
-#       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-#   stage: terraform-job-apply
-#   extends: final plan
-#   before_script:
-#     - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
-#     - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-#     - rm -rf .terraform
-#     - cd Terraform/Project
-#     - terraform version
-#     # Provides git the ability to access other private projects for use as remote Terraform modules
-#     - terraform init
-#   environment:
-#     name: TIC_POC1
-#     on_stop: destroy
-#   script:
-#     - terraform apply -input=false -auto-approve $PLAN
-#     # - ls -R
-#   dependencies:
-#     - final plan
-#   artifacts:
-#     paths:
-#       - Terraform/Project/docker_swarm.ini
-#       - Terraform/Project/postgres.ini
-#   only:
-#     - main
-#   # This ensures that only one instance of this job can run in case multiple workflows are launched in parallel
-#   resource_group: TIC_POC1
+# Job: Apply | Stage: Apply
+# Purpose: Apply the new Terraform configuration settings found in the plan file
+apply:
+  image: 
+    name: hashicorp/terraform:light
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  stage: terraform-job-apply
+  extends: final plan
+  before_script:
+    - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
+    - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    - rm -rf .terraform
+    - cd Terraform/Project
+    - terraform version
+    # Provides git the ability to access other private projects for use as remote Terraform modules
+    - terraform init
+  environment:
+    name: TIC_POC1
+    on_stop: destroy
+  script:
+    - terraform apply -input=false -auto-approve $PLAN
+    # - ls -R
+  dependencies:
+    - final plan
+  artifacts:
+    paths:
+      - Terraform/Project/docker_swarm.ini
+      - Terraform/Project/postgres.ini
+  only:
+    - main
+  # This ensures that only one instance of this job can run in case multiple workflows are launched in parallel
+  resource_group: TIC_POC1
 
-# # Job: Destroy | Stage: Apply
-# # Purpose: Stop and destroy the resources configured by Terraform
-# destroy:
-#   image: 
-#     name: hashicorp/terraform:light
-#     entrypoint:
-#       - '/usr/bin/env'
-#       - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-#   before_script:
-#     - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
-#     - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-#     - rm -rf .terraform
-#     - cd Terraform/Project
-#     - terraform version
-#     # Provides git the ability to access other private projects for use as remote Terraform modules
-#   # stage: terraform-job-apply
-#   extends: apply
-#   script:
-#     - terraform destroy -auto-approve
-#   when: manual
-#   only:
-#     - main
-#   environment:
-#     name: TIC_POC1
-#     action: stop
-#   retry: 2
+# Job: Destroy | Stage: Apply
+# Purpose: Stop and destroy the resources configured by Terraform
+destroy:
+  image: 
+    name: hashicorp/terraform:light
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  before_script:
+    - export AWS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
+    - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    - rm -rf .terraform
+    - cd Terraform/Project
+    - terraform version
+    # Provides git the ability to access other private projects for use as remote Terraform modules
+  # stage: terraform-job-apply
+  extends: apply
+  script:
+    - terraform destroy -auto-approve
+  when: manual
+  only:
+    - main
+  environment:
+    name: TIC_POC1
+    action: stop
+  retry: 2
 
-# ansible:
-#   image: registry.gitlab.com/torese/docker-ansible
-#   # extends: final plan
-#   dependencies:
-#     - apply
-#   needs:
-#     - job: apply
-#       artifacts: true
-#   before_script:
-#     - cd Terraform/Project
-#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > terraform_key.pem
-#     - chmod 400 terraform_key.pem
-#     - export ANSIBLE_HOST_KEY_CHECKING=False
-#   stage: ansible-job
-#   script:
-#     - ansible-playbook -i postgres.ini install_postgres.yaml
-#     - ansible-playbook -i docker_swarm.ini docker_swarm.yaml
-#   only:
-#     - main
-#   # when: manual
+ansible:
+  image: registry.gitlab.com/torese/docker-ansible
+  # extends: final plan
+  dependencies:
+    - apply
+  needs:
+    - job: apply
+      artifacts: true
+  before_script:
+    - cd Terraform/Project
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > terraform_key.pem
+    - chmod 400 terraform_key.pem
+    - export ANSIBLE_HOST_KEY_CHECKING=False
+  stage: ansible-job
+  script:
+    - ansible-playbook -i postgres.ini install_postgres.yaml
+    - ansible-playbook -i docker_swarm.ini docker_swarm.yaml
+  only:
+    - main
+  # when: manual
