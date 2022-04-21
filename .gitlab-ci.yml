@@ -26,8 +26,9 @@ maven-job:
   image: maven
   stage: maven-compile
   script:
+    - echo "anilstarted"
     - echo $ENV_URL
-    - sh Jars.sh
+    # - sh Jars.sh
     - echo "Worked"
   artifacts:
     paths:
