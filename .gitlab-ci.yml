@@ -23,7 +23,8 @@ stages:
 Test:
   stage: test-job
   script:
-    - echo $CI_JOB_STARTED_AT | cut -f 1 -d 'T'
+    - date_var=`echo $CI_JOB_STARTED_AT | cut -f 1 -d 'T'`
+    - echo $date_var
 
 # maven-job:
 #   image: maven
