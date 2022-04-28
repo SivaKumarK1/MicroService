@@ -23,7 +23,7 @@ stages:
 Test:
   stage: test-job
   script:
-    - echo $CI_JOB_STARTED_AT
+    - echo $CI_JOB_STARTED_AT | cut -f 1 -d 'T'
 
 # maven-job:
 #   image: maven
