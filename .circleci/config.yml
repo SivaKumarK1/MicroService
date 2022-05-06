@@ -1,8 +1,8 @@
 version: 2.1
-jobs:   
+jobs:
   build-package:
     docker:
-      - image: cimg/openjdk:11.0
+      - image: cimg/openjdk:15.0.1
         auth:
           username: anil76201
           password: Reddy@0108
@@ -12,22 +12,26 @@ jobs:
       - run:
           name: Build Contact Service
           command: |
-            cd ./contact_service; 
+            cd /contact_service; 
             mvn clean package;
-            sudo docker build -t anil76201/contactimage .
-            ls;
-            ls -R | grep .jar;
-            pwd;
+            docker build -t anil76201/contactimage .
+          working_directory: .
       - run:
           name: Build User Service
           command: |
-            cd ./user_service; 
+            cd /user_service; 
             mvn clean package;
-            sudo docker build -t anil76201/userimage .  
-            ls;
-            ls -R | grep .jar;
-            pwd;     
-
+            docker build -t anil76201/userimage .
+          working_directory: .
+      - restore_cache:
+          key: circleci-java-maven-{{ checksum "/tmp/maven_cache_seed" }}
+      - save_cache:
+          paths:
+            - ~/.m2/repository
+          key: circleci-java-maven-{{ checksum "/tmp/maven_cache_seed" }}
+      - store_artifacts:
+          path: Micro_Service_Postgres/*/target/*-SNAPSHOT.jar
+  
   test-job: # this is to run devops test commands like ls pwd or same type  
     docker:
       - image: cimg/openjdk:11.0
