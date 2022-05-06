@@ -12,18 +12,18 @@ jobs:
       - run:
           name: Build Contact Service
           command: |
-            # cd ./contact_service; 
-            # mvn clean package;
-            # docker build -t anil76201/contactimage ./contact_service
-            # ls;
-            # ls -R | grep .jar;
-            # pwd;
+            cd ./contact_service; 
+            mvn clean package;
+            docker build -t anil76201/contactimage .
+            ls;
+            ls -R | grep .jar;
+            pwd;
       - run:
           name: Build User Service
           command: |
             cd ./user_service; 
             mvn clean package;
-            docker build -t anil76201/userimage ./user_service  
+            docker build -t anil76201/userimage .  
             ls;
             ls -R | grep .jar;
             pwd;     
