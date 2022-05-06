@@ -22,9 +22,9 @@ jobs:
       - run:
           name: "Build"
           command: 
-            cd user_service
-            mvn -B -DskipTests clean install
-            cd ../contact_service
+            cd user_service |
+            mvn -B -DskipTests clean install |
+            cd ../contact_service |
             mvn -B -DskipTests clean install
 
 # Invoke jobs via workflows
