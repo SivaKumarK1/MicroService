@@ -1,35 +1,45 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-
-orbs:
-  maven: circleci/maven@1.3.0
-  docker: circleci/docker@2.1.1
-  terraform: circleci/terraform@3.0.1
-
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-jobs:
-  maven-job:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+jobs:   
+  build-package:
     docker:
-      - image: circleci/openjdk:8-jdk-stretch
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+      - image: cimg/openjdk:11.0
+        auth:
+          username: anil76201
+          password: Reddy@0108
+    # working_directory: ~/Micro_Service_Postgres
     steps:
       - checkout
       - run:
-          name: "Build"
+          name: Build Contact Service
           command: |
-            cd user_service
-            mvn clean install
-            cd ../contact_service
-            mvn clean install
+            cd Micro_Service_Postgres/contact_service; 
+            mvn clean package;
+            docker build -t anil76201/contactimage ./Micro_Service_Postgres/contact_service
+            ls;
+            ls -R | grep .jar;
+            pwd;
+      - run:
+          name: Build User Service
+          command: |
+            cd Micro_Service_Postgres/user_service; 
+            mvn clean package;
+            docker build -t anil76201/userimage ./Micro_Service_Postgres/user_service  
+            ls;
+            ls -R | grep .jar;
+            pwd;     
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+  test-job: # this is to run devops test commands like ls pwd or same type  
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+        - run:
+            command: |
+              pwd;
+              ls;
+
 workflows:
-  micro_service_project:
+  lincker: 
     jobs:
-      - maven-job
+      - build-package
+      - build-package
+      - test-job
