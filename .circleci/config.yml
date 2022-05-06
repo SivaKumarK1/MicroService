@@ -32,8 +32,9 @@ jobs:
             - ~/.m2/repository
           key: circleci-java-maven-{{ checksum "/tmp/maven_cache_seed" }}
       - store_artifacts:
-          path: Micro_Service_Postgres/*/target/*-SNAPSHOT.jar
-  
+          path: Micro_Service_Postgres/user_service/target/*.jar
+      - store_artifacts:
+          path: Micro_Service_Postgres/contact_service/target/*.jar
   test-job: # this is to run devops test commands like ls pwd or same type  
     docker:
       - image: cimg/openjdk:11.0
