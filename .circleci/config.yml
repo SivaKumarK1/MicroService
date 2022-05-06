@@ -1,4 +1,8 @@
 version: 2.1
+
+orbs:
+  docker: circleci/docker@2.1.1
+
 jobs:
   build-package:
     docker:
@@ -6,9 +10,9 @@ jobs:
         auth:
           username: anil76201
           password: Reddy@0108
-    # working_directory: ~/Micro_Service_Postgres
     steps:
       - checkout
+      - docker/install-docker
       - run:
           name: Build Contact Service
           command: |
