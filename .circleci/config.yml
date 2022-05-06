@@ -20,7 +20,7 @@ jobs:
             mvn clean package;
             pwd;
             ls -R;
-            sudo service start docker
+            sudo systemctl start docker
             sudo docker build -t anil76201/contactimage .
           working_directory: .
       - run:
@@ -30,7 +30,7 @@ jobs:
             mvn clean package;
             pwd
             ls -R;
-            sudo service start docker
+            sudo systemctl start docker
             sudo docker build -t anil76201/userimage .
           working_directory: .
       - restore_cache:
