@@ -22,7 +22,7 @@ jobs:
       - run:
           name: "Build"
           command: 
-            cd user_service |
+            cd Micro_Service_Postgres/user_service |
             mvn -B -DskipTests clean install |
             cd ../contact_service |
             mvn -B -DskipTests clean install
