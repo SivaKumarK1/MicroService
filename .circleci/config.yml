@@ -21,13 +21,12 @@ jobs:
       - run:
           name: Build User Service
           command: |
+            cd /user_service; 
+            mvn clean package;
+            docker build -t anil76201/userimage ./user_service  
             ls;
-            # cd /user_service; 
-            # mvn clean package;
-            # docker build -t anil76201/userimage ./user_service  
-            # ls;
-            # ls -R | grep .jar;
-            # pwd;     
+            ls -R | grep .jar;
+            pwd;     
 
   test-job: # this is to run devops test commands like ls pwd or same type  
     docker:
