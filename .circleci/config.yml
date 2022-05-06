@@ -15,7 +15,7 @@ jobs:
             ls
             cd contact_service; 
             mvn clean package;
-            # docker build -t anil76201/contactimage .
+            sudo docker build -t anil76201/contactimage .
           working_directory: .
       - run:
           name: Build User Service
@@ -23,7 +23,7 @@ jobs:
             ls
             cd user_service; 
             mvn clean package;
-            # docker build -t anil76201/userimage .
+            sudo docker build -t anil76201/userimage .
           working_directory: .
       - restore_cache:
           key: circleci-java-maven-{{ checksum "/tmp/maven_cache_seed" }}
