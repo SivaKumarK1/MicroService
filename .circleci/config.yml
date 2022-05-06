@@ -16,7 +16,6 @@ jobs:
           command: |
             cd contact_service; 
             mvn clean package;
-            systemctl start docker;
             sudo docker build -t anil76201/contactimage .
           working_directory: .
       - run:
@@ -24,7 +23,6 @@ jobs:
           command: |
             cd user_service; 
             mvn clean package;
-            systemctl start docker;
             sudo docker build -t anil76201/userimage .
           working_directory: .
       - restore_cache:
