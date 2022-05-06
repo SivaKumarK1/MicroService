@@ -1,8 +1,4 @@
 version: 2.1
-
-orbs:
-  docker: circleci/docker@2.1.1
-
 jobs:
   build-package:
     docker:
@@ -12,15 +8,13 @@ jobs:
           password: Reddy@0108
     steps:
       - checkout
-      - docker/install-docker
+      - setup_remote_docker:
+          docker_layer_caching: false
       - run:
           name: Build Contact Service
           command: |
             cd contact_service; 
             mvn clean package;
-            pwd;
-            ls -R;
-            sudo systemctl start docker
             sudo docker build -t anil76201/contactimage .
           working_directory: .
       - run:
@@ -28,9 +22,6 @@ jobs:
           command: |
             cd user_service; 
             mvn clean package;
-            pwd
-            ls -R;
-            sudo systemctl start docker
             sudo docker build -t anil76201/userimage .
           working_directory: .
       - restore_cache:
