@@ -14,7 +14,7 @@ jobs:
           command: |
             cd ./contact_service; 
             mvn clean package;
-            docker build -t anil76201/contactimage .
+            sudo docker build -t anil76201/contactimage .
             ls;
             ls -R | grep .jar;
             pwd;
@@ -23,7 +23,7 @@ jobs:
           command: |
             cd ./user_service; 
             mvn clean package;
-            docker build -t anil76201/userimage .  
+            sudo docker build -t anil76201/userimage .  
             ls;
             ls -R | grep .jar;
             pwd;     
