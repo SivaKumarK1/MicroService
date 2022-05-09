@@ -1,5 +1,18 @@
 version: 2.1
+
+orbs:
+  terraform: circleci/terraform@3.0.1
+  aws-cli: circleci/aws-cli@2.0
+  
 jobs:
+  aws-cli-cred-setup:
+    executor: aws-cli/default
+    steps:
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY
+          aws-secret-access-key: AWS_ACCESS_SECRET
+          aws-region: AWS_REGION_NAME
+
   build-package:
     docker:
       - image: cimg/openjdk:15.0.1
@@ -41,6 +54,25 @@ jobs:
       - store_artifacts:
           path: ./contact_service/target/contact_service-0.0.1-SNAPSHOT.jar
           destination: ./contact_service.jar
+  
+  terraform-job:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - terraform/install
+      - run:
+          name: Get&Run Terraform Scripts
+          command: |
+            git clone https://gitlab.com/SivaKumarK1/Terraform;
+            cd Terraform;
+            terraform init;
+            terraform validate;
+            terraform plan
+      - run:
+          name: Apply Terraform
+          command: |
+            
+
   test-job: # this is to run devops test commands like ls pwd or same type  
     docker:
       - image: cimg/openjdk:11.0
@@ -53,6 +85,8 @@ jobs:
 workflows:
   lincker: 
     jobs:
+      - aws-cli-cred-setup
       - build-package
       - build-package
       - test-job
+      - terraform-job
